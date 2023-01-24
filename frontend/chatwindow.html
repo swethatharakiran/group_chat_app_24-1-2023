@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat window page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.min.js"></script>
+  
+</head>
+<body style="background-color:greenyellow">
+    
+    
+    <div class="container-sm" >
+    <div class="row">
+    <div class="col offset-md-3">
+        <heading>
+            <h2> Chat app</h2>
+        </heading><br>
+
+        <p>You joined</p>
+        <form id="chatwindowform" method="POST"
+         class="bg-info bg-gradient border rounded" style="width:300px;padding:10px">
+            <label><b>You:</b></label>
+            <input type="text" id="chat" name="chat">
+            <input type="submit"  name="login" value="|>">
+            
+    </form>
+    <br>
+</div>
+</div>
+</div>
+
+    <script src="chatwindow.js"></script>
+</body>
+</html>
