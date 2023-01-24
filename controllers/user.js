@@ -21,12 +21,12 @@ exports.signupaction=async(req,res,next)=>{
         else{
             const duplicate=await User.findAll({where:{email:email}})
             if(duplicate.length!=0){
-                res.json({message:"User already exists, give different mailid"})
+                res.json({message:"User already exists, Please Login"})
             }
             else{
             await User.create({username:username,email:email,phone:phone,password:hash})
             .then(()=>{
-            res.json({message:"successfully created new user"})
+            res.json({message:"successfully signed up"})
            })
          .catch(err=>{
          res.send(err)

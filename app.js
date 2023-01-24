@@ -18,7 +18,14 @@ const userroutes=require('./routes/user');
 //app.use(morgan('combined',{stream:accesslogstream}));
 
 
-app.use(cors());
+app.use(
+    cors({
+        origin:"*",
+        methods:["GET","POST","PUT"],
+        credentials:true
+    }
+
+));
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({extended:true}));
 app.use(userroutes);
