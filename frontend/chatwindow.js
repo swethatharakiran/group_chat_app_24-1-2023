@@ -1,12 +1,14 @@
 const f3=document.getElementById('chatwindowform');
 const chats=document.getElementById('grpchats');
 console.log("HI from CHATFRONTEND");
-axios.get("http://localhost:3000/group/chatmessages")
+setInterval(()=>{
+    axios.get("http://localhost:3000/group/chatmessages")
 .then((result)=>{
        console.log(result.data);
        showchats(result.data);       
 
 }).catch(err=>{console.log(err)})
+},1000);
 
   function showchats(data){
     for(let i=0;i<data.allmessages.length;i++)
