@@ -1,8 +1,10 @@
 const User=require('../models/user');
 const Chatmessages=require('../models/chatmessages');
 const jwt=require('jsonwebtoken');
+const {Sequelize,Op}=require('sequelize');
 
 exports.groupchatmessage=async(req,res,next)=>{
+
     
     const chatmessage=req.body.chat;
     console.log("HIIII-->>")
@@ -17,17 +19,20 @@ exports.groupchatmessage=async(req,res,next)=>{
         }
   
 exports.getallchatmessages=async(req,res,next)=>{
-  console.log("HI FROM HERE")
+
+  const lastmessageid=req.query.lastmessageid;
 
   try{
   const allmessages=await Chatmessages.findAll({
-    attributes:['chatmessage'],
+    attributes:['chatmessage','id'], 
     include:[
       {
         model:User,
         attributes:['username']
       }
-    ]
+    ], 
+    where:{id:{[Op.gt]:lastmessageid}}
+    
   });
   res.status(200).json({allmessages:allmessages});
 
