@@ -11,6 +11,8 @@ dotenv.config();
 const sequelize=require('./util/database.js');
 const User=require('./models/user.js');
 const Chatmessages=require('./models/chatmessages');
+const Group=require('./models/group');
+const Usergroup=require('./models/usergroupbridge');
 
 const userroutes=require('./routes/user');
 const groupchatroutes=require('./routes/groupchat');
@@ -39,6 +41,13 @@ app.use(groupchatroutes);
 
 User.hasMany(Chatmessages);
 Chatmessages.belongsTo(User);
+
+Group.hasMany(Chatmessages);
+Chatmessages.belongsTo(Group);
+
+
+User.belongsToMany(Group,{through:Usergroup});
+Group.belongsToMany(User,{through:Usergroup});
 
 sequelize.sync().then(res=>{
     app.listen(process.env.PORT);

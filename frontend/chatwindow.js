@@ -1,6 +1,6 @@
 const f3=document.getElementById('chatwindowform');
 const chats=document.getElementById('grpchats');
-console.log("HI from CHATFRONTEND");
+//console.log("HI from CHATFRONTEND");
 //setInterval(()=>{
 //    axios.get("http://localhost:3000/group/chatmessages")
 //.then((result)=>{
@@ -25,8 +25,10 @@ f3.addEventListener("submit",onchatsubmit);
 async function onchatsubmit(e){
     e.preventDefault();
     const chat=document.getElementById('chat').value;
+    const groupid=localStorage.getItem('groupid');
     const obj3={
-        chat:chat
+        chat:chat,
+        groupid:groupid
     }
     const token=localStorage.getItem('token');
     try{
@@ -46,26 +48,42 @@ async function onchatsubmit(e){
  
 }
 
+let lastmessageid;
 window.addEventListener('DOMContentLoaded',()=>{
     let oldmessages=[];
     console.log("--->",oldmessages)
     const local_data=JSON.parse(localStorage.getItem('oldmessages'));
     console.log("local_data",local_data)
     console.log(oldmessages);
-    let lastmessageid;
+    
+    const gid=localStorage.getItem('groupid');
+    console.log("GID",gid);
     if(local_data===null){
         lastmessageid=-1;
-        axios.get(`http://localhost:3000/group/chatmessages?lastmessageid=${lastmessageid}`)
+        axios.get(
+    `http://localhost:3000/group/chatmessages?lastmessageid=${lastmessageid}&groupid=${gid}`)
         .then((result)=>{
-       //console.log("hello",result.data.allmessages);
+       console.log("hello-->",result.data.allmessages[0].id);
+       const totalmsgs=result.data.allmessages.length;
+       if(totalmsgs<10){
+        for(let i=0;i<result.data.allmessages.length;i++){
+            oldmessages.push({id:result.data.allmessages[i].id,
+                      username:result.data.allmessages[i].user.username,
+                      chatmessage:result.data.allmessages[i].chatmessage });
+           }
+
+       }
 
        //showchats(result.data.allmessages); 
        //copying to local storage only last 10 messages
+       else{
        for(let i=result.data.allmessages.length-10;i<result.data.allmessages.length;i++){
         oldmessages.push({id:result.data.allmessages[i].id,
                   username:result.data.allmessages[i].user.username,
                   chatmessage:result.data.allmessages[i].chatmessage });
        }
+    }
+       console.log("OLDIES",oldmessages);
        showchats(oldmessages);
        localStorage.setItem('oldmessages',JSON.stringify(oldmessages));      
 
@@ -76,7 +94,8 @@ else{
     console.log("oldmsgs--",oldmessages);
     console.log("oldmsgs",oldmessages[oldmessages.length-1].id);
     lastmessageid=oldmessages[oldmessages.length-1].id;
-    axios.get(`http://localhost:3000/group/chatmessages?lastmessageid=${lastmessageid}`)
+    axios.get(
+    `http://localhost:3000/group/chatmessages?lastmessageid=${lastmessageid}&groupid=${gid}`)
 .then((result1)=>{
        //console.log(result.data);
         let newmessages=[];
@@ -99,3 +118,23 @@ else{
 }
 
 })
+
+function search_user(){
+    //e.preventDefault();
+    const token=localStorage.getItem('token');
+    const mem=document.getElementById('searchuser').value;
+    const gid={
+        groupid:localStorage.getItem('groupid'),
+        email:mem
+    };
+    try{
+        axios.post("http://localhost:3000/group/addmember",
+        gid, {headers:{"Authorization":token}})
+        .then(result=>{
+            alert(result.data.message);
+        })
+    }
+    catch(err){console.log(err)}
+
+
+}

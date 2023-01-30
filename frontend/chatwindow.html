@@ -13,6 +13,13 @@
     
     <div class="container-sm" >
     <div class="row">
+        <div class="col offset-md-3">
+        <!--form id="addmemberfrom" method="POST"
+        class="bg-info bg-gradient border rounded" style="width:300px;padding:10px"-->
+          <label>Add a member</label>
+          <input type="search" id="searchuser" name="searchuser" onsearch="search_user()"> 
+    </div>
+   
     <div class="col offset-md-3">
         <heading>
             <h2> Chat app</h2>
@@ -23,15 +30,13 @@
             <li style="list-style:none"><b>You joined</b></li>
 
             </ul>
-
-
         </div>
         
         <form id="chatwindowform" method="POST"
          class="bg-info bg-gradient border rounded" style="width:300px;padding:10px">
             <label><b>You:</b></label>
             <input type="text" id="chat" name="chat">
-            <input type="submit"  name="login" value="|>">
+            <input type="submit"  name="submit" value="|>">
             
     </form>
     <br>

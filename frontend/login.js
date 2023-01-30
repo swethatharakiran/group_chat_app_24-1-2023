@@ -16,7 +16,7 @@ async function onloginsubmit(e){
     console.log(response.data)
     alert(response.data.message); //login success message
     localStorage.setItem('token',response.data.token);
-    window.location.href="chatwindow.html";
+    window.location.href="grouplist.html";
     
     }
 
