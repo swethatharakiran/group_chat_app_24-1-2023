@@ -34,8 +34,7 @@ exports.getallchatmessages=async(req,res,next)=>{
       {
         model:User,
         attributes:['username'],
-      
-        
+              
       }       
     ],
     where:{id:{[Op.gt]:lastmessageid},  groupId:groupid}
@@ -80,7 +79,7 @@ exports.creategroup=async(req,res,next)=>{
         //{where:{email:req.body.email1}})
       //const mem1_id=mem1[0].dataValues.id;
       
-      await Usergroup.create({userId:req.user.id,groupId:newgroup.id});
+      await Usergroup.create({isadmin:1,userId:req.user.id,groupId:newgroup.id});
       //await Usergroup.create({userId:mem1_id,groupId:newgroup.id});
     
       res.json({message:'successfully created group'})
@@ -97,14 +96,14 @@ exports.creategroup=async(req,res,next)=>{
     const email=req.body.email;
 
        
-    const grp_admin=await Group.findOne(
-      {attributes:['groupadmin'],
-      where:{id:groupid}});
-    console.log("GRP-ADMIN--",grp_admin.dataValues.groupadmin);
+    const grp_admin=await Usergroup.findOne(
+      {attributes:['isadmin'],
+      where:{groupId:groupid,userId:req.user.id}});
+    console.log("GRP-ADMIN--",grp_admin.dataValues.isadmin);
     
       // checking whether user is admin or not
-      if(grp_admin.dataValues.groupadmin==userid){
-        // getting userid by using email id sent
+      if(grp_admin.dataValues.isadmin==1){//he is admin
+        // getting userid(of to be mem) by using email id sent for adding to grp
         const mem_id=await User.findOne(
           {//attributes:['id'],
           where:{email:email}}); 
@@ -124,7 +123,7 @@ exports.creategroup=async(req,res,next)=>{
             console.log("MEMBER",mem_id.dataValues)
           if(mem_id.dataValues.id){
             
-                await Usergroup.create({userId:mem_id.dataValues.id, groupId:groupid})
+                await Usergroup.create({isadmin:0,userId:mem_id.dataValues.id, groupId:groupid})
                 .then(()=>{
                   res.json({message:"successfully added new member"})
                 })
@@ -139,5 +138,99 @@ exports.creategroup=async(req,res,next)=>{
         res.json({message:"You are not admin of group to add members"})
       }
       
+  }
+
+  exports.memberslist=async(req,res,next)=>{
+        
+     const userid=req.user.id;
+     const groupid=req.query.groupid;
+     console.log("MEMLIST");
+     try{
+     const userids=await Usergroup.findAll({
+      attributes:['userId','groupId','isadmin'], 
+      where:{groupId:groupid},
+    });
+    console.log("USERIDS length-->>>",userids.length);
+    let user_ids=[];
+    let ids_withadminstatus=[]
+    for(let i=0;i<userids.length;i++){
+    user_ids.push(userids[i].dataValues.userId);
+      ids_withadminstatus.push({userid:userids[i].dataValues.userId, 
+        isadmin:userids[i].dataValues.isadmin});
+    }
+    console.log("USERIDS-->>>",user_ids);
+    const usernames= await User.findAll(
+      {
+        attributes:['username','id'],
+        where:{id:{[Op.in]:user_ids}}
+      },
+    );
+    const grp_mem_det=[];
+    for(let i=0;i<usernames.length;i++){
+      const member_det=await Usergroup.findOne({where:{userId:usernames[i].id,groupId:groupid}})
+      grp_mem_det.push({username:usernames[i].username,
+        isadmin:member_det.isadmin, 
+        id:member_det.userId})
+        console.log(member_det.isadmin)
+    }
+      //await User.findAll({where:{userids}})
+      console.log("USERNAMES-->",usernames);
+      console.log("MEM_DETAILS-->>>",grp_mem_det);
+
+      res.json({memlist:grp_mem_det})
+    }
+    catch(err){console.log(err)}
+  }
+
+    exports.makeadmin=async(req,res,next)=>{
+        try{
+          const groupid=req.body.groupid;
+          const grp_admin=await Usergroup.findOne(
+            {attributes:['isadmin'],
+            where:{groupId:groupid,userId:req.user.id}});
+          console.log("GRP-ADMIN--",grp_admin.dataValues.isadmin);
+          
+            // checking whether user is admin or not
+            if(grp_admin.dataValues.isadmin==1){//he is admin
+
+          await Usergroup.update(
+            {isadmin:1},
+            {where:{userId:req.body.mem_id,groupId:req.body.groupid}})
+            .then(()=>{
+              res.json({message:"made as admin successfully"})
+            })
+          }
+          else{
+            res.json({message:"You are not admin"})
+          }
+        }
+        catch(err){console.log(err)}
+
+
+  }
+
+  exports.deletemem=async(req,res,next)=>{
+    try{
+      const groupid=req.body.groupid;
+      const grp_admin=await Usergroup.findOne(
+        {attributes:['isadmin'],
+        where:{groupId:groupid,userId:req.user.id}});
+      console.log("GRP-ADMIN--",grp_admin.dataValues.isadmin);
+      
+        // checking whether user is admin or not
+        if(grp_admin.dataValues.isadmin==1){//he is admin
+
+      await Usergroup.destroy({where:{userId:req.body.mem_id,groupId:req.body.groupid}})
+      .then(()=>{
+        res.json({message:"Removed Successfully"});
+        console.log("FROM DEL BKND");
+      })
+     }
+     else{
+      res.json({message:"You are not admin"})
+     }
+
+    }
+    catch(err){console.log(err)}
 
   }

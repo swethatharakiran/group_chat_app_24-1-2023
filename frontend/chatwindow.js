@@ -1,5 +1,8 @@
 const f3=document.getElementById('chatwindowform');
 const chats=document.getElementById('grpchats');
+const mem_list=document.getElementById('mem_list');
+const token=localStorage.getItem('token');
+const gid=localStorage.getItem('groupid');
 //console.log("HI from CHATFRONTEND");
 //setInterval(()=>{
 //    axios.get("http://localhost:3000/group/chatmessages")
@@ -30,7 +33,7 @@ async function onchatsubmit(e){
         chat:chat,
         groupid:groupid
     }
-    const token=localStorage.getItem('token');
+    
     try{
     const response=await axios.post("http://localhost:3000/group/chat",obj3,
     {headers:{"Authorization":token}})
@@ -47,23 +50,23 @@ async function onchatsubmit(e){
     };
  
 }
-
+// Refresh
 let lastmessageid;
-window.addEventListener('DOMContentLoaded',()=>{
+window.addEventListener('DOMContentLoaded',async()=>{
     let oldmessages=[];
     console.log("--->",oldmessages)
     const local_data=JSON.parse(localStorage.getItem('oldmessages'));
     console.log("local_data",local_data)
-    console.log(oldmessages);
-    
-    const gid=localStorage.getItem('groupid');
+    //console.log(oldmessages);
+        
     console.log("GID",gid);
-    if(local_data===null){
+    try{
+    if(local_data.length==0){
         lastmessageid=-1;
         axios.get(
     `http://localhost:3000/group/chatmessages?lastmessageid=${lastmessageid}&groupid=${gid}`)
         .then((result)=>{
-       console.log("hello-->",result.data.allmessages[0].id);
+       //console.log("hello-->",result.data.allmessages[0].id);
        const totalmsgs=result.data.allmessages.length;
        if(totalmsgs<10){
         for(let i=0;i<result.data.allmessages.length;i++){
@@ -94,9 +97,10 @@ else{
     console.log("oldmsgs--",oldmessages);
     console.log("oldmsgs",oldmessages[oldmessages.length-1].id);
     lastmessageid=oldmessages[oldmessages.length-1].id;
-    axios.get(
-    `http://localhost:3000/group/chatmessages?lastmessageid=${lastmessageid}&groupid=${gid}`)
-.then((result1)=>{
+axios.get(
+`http://localhost:3000/group/chatmessages?lastmessageid=${lastmessageid}&groupid=${gid}`)
+
+  .then((result1)=>{
        //console.log(result.data);
         let newmessages=[];
        for(let i=0;i<result1.data.allmessages.length;i++){
@@ -116,8 +120,76 @@ else{
 
 }).catch(err=>{console.log(err)})
 }
+// To list/display group members
+
+await axios.get(`http://localhost:3000/group/memberslist?groupid=${gid}`,
+{headers:{"Authorization":token}})
+.then(result=>{
+    console.log("LISTING",result.data.memlist);
+    const grp_mem=result.data.memlist;
+    console.log("FRONTEND",grp_mem);
+    for(let i=0;i<grp_mem.length;i++){
+        if(grp_mem[i].isadmin==0){
+        mem_list.innerHTML+=`<tr id="${grp_mem[i].id}">
+        <td><b>${grp_mem[i].username}</b></td> 
+        <td id="${grp_mem[i].id}a"><button onclick="make_admin('${grp_mem[i].id}')">
+        make admin</button></td>
+        <td><button  onclick="remove_mem('${grp_mem[i].id}')">remove</button></td>
+        </tr>`
+        }
+        else{
+            mem_list.innerHTML+=
+            `<tr id="${grp_mem[i].id}">
+            <td><b>${grp_mem[i].username}</b></td>
+            <td> admin</td>
+        <td><button  onclick="remove_mem('${grp_mem[i].id}')">remove</button></td>
+        </tr>`
+        }
+      }
+    });
+
+}// try ends
+catch(err){console.log(err)}
 
 })
+
+async function make_admin(mem_id){//userid
+    const ob1={
+        mem_id:mem_id,
+        groupid:gid
+    }
+    await axios.post("http://localhost:3000/group/makeadmin",
+    ob1,{headers:{"Authorization":token}})
+    .then(result=>{
+        const td=document.getElementById(`${mem_id}a`);
+        td.innerHTML="admin"
+        alert(result.data.message);
+    })
+    .catch(err=>console.log(err))
+
+}
+
+async function remove_mem(mem_id){
+    
+    const memid={
+        mem_id:mem_id,
+        groupid:gid
+    }
+
+    await axios.post("http://localhost:3000/group/deletemem",
+    memid,{headers:{"Authorization":token}})
+    .then((result)=>{
+        console.log(result);
+        mem_list.deleteRow(document.getElementById(mem_id))
+        console.log(result.data.message);
+        alert(result.data.message);
+    }).catch(err=>{
+        console.log(err)
+        
+    })
+
+
+}
 
 function search_user(){
     //e.preventDefault();
