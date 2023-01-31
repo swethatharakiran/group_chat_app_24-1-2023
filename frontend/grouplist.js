@@ -8,9 +8,9 @@ try{
     .then(result=>{
         console.log(result.data);
         for(let i=0;i<result.data.grouplist.length;i++){
-        grouplist.innerHTML+=`<li><button type ="submit" class="btn btn-secondary" 
+        grouplist.innerHTML+=`<li style="list-style:none"><button type ="submit" class="btn btn-secondary" 
         onclick="href_func(${result.data.grouplist[i].id})">
-        ${result.data.grouplist[i].groupname}</button></li>`
+        ${result.data.grouplist[i].groupname}</button></li><br>`
         }
 
     })

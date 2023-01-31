@@ -14,6 +14,8 @@ Router.get('/group/memberslist',authmiddleware.userauthorization,chatcontroller.
 
 Router.post('/group/makeadmin',authmiddleware.userauthorization,chatcontroller.makeadmin);
 Router.post('/group/deletemem',authmiddleware.userauthorization,chatcontroller.deletemem);
+Router.post('/group/chatimage',authmiddleware.userauthorization,chatcontroller.chatimage);
+
 
 
 module.exports=Router;

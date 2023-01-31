@@ -13,6 +13,7 @@ const User=require('./models/user.js');
 const Chatmessages=require('./models/chatmessages');
 const Group=require('./models/group');
 const Usergroup=require('./models/usergroupbridge');
+const Chatpicture=require('./models/chatpics');
 
 const userroutes=require('./routes/user');
 const groupchatroutes=require('./routes/groupchat');
@@ -48,6 +49,13 @@ Chatmessages.belongsTo(Group);
 
 User.belongsToMany(Group,{through:Usergroup});
 Group.belongsToMany(User,{through:Usergroup});
+
+Group.hasMany(Chatpicture);
+Chatpicture.belongsTo(Group);
+
+User.hasMany(Chatpicture);
+Chatpicture.belongsTo(User);
+
 
 sequelize.sync().then(res=>{
     app.listen(process.env.PORT);
