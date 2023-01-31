@@ -12,7 +12,7 @@ const Group=sequelize.define('group',{
         type:Sequelize.STRING,
         allowNull:false,
     },
-    groupadmin:{
+    groupadmin:{//created person
         type:Sequelize.INTEGER,
         allowNull:false
     }

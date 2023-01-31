@@ -10,6 +10,10 @@ Router.get('/group/grouplist',authmiddleware.userauthorization,chatcontroller.gr
 Router.post('/group/creategroup',authmiddleware.userauthorization,chatcontroller.creategroup);
 
 Router.post('/group/addmember',authmiddleware.userauthorization,chatcontroller.addgroupmember);
+Router.get('/group/memberslist',authmiddleware.userauthorization,chatcontroller.memberslist);
+
+Router.post('/group/makeadmin',authmiddleware.userauthorization,chatcontroller.makeadmin);
+Router.post('/group/deletemem',authmiddleware.userauthorization,chatcontroller.deletemem);
 
 
 module.exports=Router;
