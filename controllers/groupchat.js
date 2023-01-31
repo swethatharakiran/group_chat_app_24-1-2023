@@ -4,6 +4,7 @@ const jwt=require('jsonwebtoken');
 const {Sequelize,Op}=require('sequelize');
 const Group = require('../models/group');
 const Usergroup = require('../models/usergroupbridge');
+const Chatpics=require('../models/chatpics');
 
 exports.groupchatmessage=async(req,res,next)=>{
 
@@ -234,3 +235,47 @@ exports.creategroup=async(req,res,next)=>{
     catch(err){console.log(err)}
 
   }
+
+  exports.chatimage=async(req,res,next)=>{
+
+    const chatmessage=req.body.picture;
+    const groupid=req.body.groupid;
+    console.log("HIIII-->>")
+
+              await Chatpics.create(
+              {picture:chatmessage,userId:req.user.id,groupId:groupid})
+            .then(()=>{
+            res.json({message:"photo/picture sent successfully"})
+           })
+         .catch(err=>{
+         res.send(err)
+          })
+    }
+
+   /* exports.getallchatpics=async(req,res,next)=>{
+
+      const lastmessageid=req.query.lastmessageid;
+      const groupid=req.query.groupid;
+    
+      try{
+      const picture=await Chatpics.findOne({
+        attributes:['picture','id'], 
+        include:[
+          {
+            model:User,
+            attributes:['username'],
+                  
+          }       
+        ],
+        where:{id:{[Op.gt]:lastmessageid},  groupId:groupid}
+      });
+    
+      res.status(200).json({picture:picture});
+    
+       }
+      catch(err){
+        console.log(err);
+      }
+    
+    }
+  */

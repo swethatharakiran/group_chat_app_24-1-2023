@@ -61,7 +61,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
         
     console.log("GID",gid);
     try{
-    if(local_data.length==0){
+    if(local_data==null||local_data.length==0){
         lastmessageid=-1;
         axios.get(
     `http://localhost:3000/group/chatmessages?lastmessageid=${lastmessageid}&groupid=${gid}`)
@@ -151,6 +151,7 @@ await axios.get(`http://localhost:3000/group/memberslist?groupid=${gid}`,
 }// try ends
 catch(err){console.log(err)}
 
+// to get picture sent in grp
 })
 
 async function make_admin(mem_id){//userid
@@ -208,5 +209,33 @@ function search_user(){
     }
     catch(err){console.log(err)}
 
+}
 
+async function send_image(files){
+
+    alert(files[0].name);
+    console.log(files[0]);
+    let file1=files[0];
+    const groupid=localStorage.getItem('groupid');
+    const obj4={
+        groupid:groupid,
+        picture:file1
+    }
+    
+    try{
+    const response=await axios.post("http://localhost:3000/group/chatimage",obj4,
+    {headers:{"Authorization":token}})
+    
+    console.log(response.data)
+    alert(response.data.message); //message sent success
+    
+    }
+
+    catch(err){console.log(err)
+        document.body.innerHTML+=`<div style="color:red">${err.message}</div>`
+        
+    
+    };
+    console.log(file1);
+   
 }
